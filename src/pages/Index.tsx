@@ -1,23 +1,33 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { UserPlus, MapPin, MessageSquare, Calendar } from "lucide-react";
+import { useAuthStore } from "@/lib/store";
 import heroBackground from "@/assets/hero-background.jpg";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { user, loading } = useAuthStore();
+
+  useEffect(() => {
+    // Redirect authenticated users to home page
+    if (!loading && user) {
+      navigate("/home", { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   const mainActions = [
     {
       icon: UserPlus,
-      title: "Request a Stand-In",
+      title: "Request a Proxy",
       description: "Find someone to be there for you",
       action: () => navigate("/request"),
       variant: "warm" as const,
     },
     {
       icon: MapPin,
-      title: "Track My Stand-In",
+      title: "Track My Proxy",
       description: "See real-time updates",
       action: () => navigate("/presence/1"),
       variant: "soft" as const,
@@ -25,7 +35,7 @@ const Index = () => {
     {
       icon: MessageSquare,
       title: "Messages",
-      description: "Chat with your stand-in",
+      description: "Chat with your proxy",
       action: () => {},
       variant: "outline" as const,
     },
@@ -109,7 +119,7 @@ const Index = () => {
           <p className="text-navy-light max-w-2xl mx-auto leading-relaxed mb-6">
             Life moves fast, and sometimes you can't be everywhere at once. 
             Whether it's a funeral, wedding, court date, or hospital visit, 
-            we connect you with compassionate stand-ins who show up with care.
+            we connect you with compassionate proxies who show up with care.
           </p>
           <Button variant="warm" size="lg" onClick={() => navigate("/request")}>
             Get Started

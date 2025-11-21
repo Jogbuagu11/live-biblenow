@@ -39,7 +39,12 @@ class AuthState extends _$AuthState {
     state = const AsyncValue.loading();
     try {
       final response = await SupabaseService.signIn(email, password);
-      state = AsyncValue.data(response);
+      state = AsyncValue.data(
+        AuthResponse(
+          user: response.user,
+          session: response.session,
+        ),
+      );
     } catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);
       rethrow;
@@ -50,7 +55,12 @@ class AuthState extends _$AuthState {
     state = const AsyncValue.loading();
     try {
       final response = await SupabaseService.signUp(email, password, name: name);
-      state = AsyncValue.data(response);
+      state = AsyncValue.data(
+        AuthResponse(
+          user: response.user,
+          session: response.session,
+        ),
+      );
     } catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);
       rethrow;
@@ -62,6 +72,34 @@ class AuthState extends _$AuthState {
     try {
       await SupabaseService.signOut();
       state = const AsyncValue.data(null);
+    } catch (e, stackTrace) {
+      state = AsyncValue.error(e, stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> signInWithGoogle() async {
+    print('[AuthProvider] signInWithGoogle called');
+    state = const AsyncValue.loading();
+    try {
+      print('[AuthProvider] Calling SupabaseService.signInWithGoogle()...');
+      final result = await SupabaseService.signInWithGoogle();
+      print('[AuthProvider] SupabaseService.signInWithGoogle() returned: $result');
+      // OAuth will redirect, so we don't update state here
+      print('[AuthProvider] Google OAuth flow initiated, waiting for redirect...');
+    } catch (e, stackTrace) {
+      print('[AuthProvider] ERROR in signInWithGoogle: $e');
+      print('[AuthProvider] Stack trace: $stackTrace');
+      state = AsyncValue.error(e, stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> signInWithApple() async {
+    state = const AsyncValue.loading();
+    try {
+      await SupabaseService.signInWithApple();
+      // OAuth will redirect, so we don't update state here
     } catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);
       rethrow;

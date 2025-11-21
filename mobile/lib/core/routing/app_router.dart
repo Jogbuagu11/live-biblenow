@@ -8,6 +8,9 @@ import 'package:tmwy/features/events/presentation/pages/event_details_page.dart'
 import 'package:tmwy/features/events/presentation/pages/request_standin_page.dart';
 import 'package:tmwy/features/events/presentation/pages/select_standin_page.dart';
 import 'package:tmwy/features/presence/presentation/pages/presence_mode_page.dart';
+import 'package:tmwy/features/feed/presentation/pages/feed_page.dart';
+import 'package:tmwy/features/messages/presentation/pages/messages_page.dart';
+import 'package:tmwy/features/messages/presentation/pages/conversation_page.dart';
 import 'package:tmwy/core/providers/auth_provider.dart';
 
 part 'app_router.g.dart';
@@ -48,6 +51,25 @@ GoRouter router(RouterRef ref) {
         path: '/home',
         name: 'home',
         builder: (context, state) => const HomePage(),
+      ),
+      GoRoute(
+        path: '/feed',
+        name: 'feed',
+        builder: (context, state) => const FeedPage(),
+      ),
+      GoRoute(
+        path: '/messages',
+        name: 'messages',
+        builder: (context, state) => const MessagesPage(),
+      ),
+      GoRoute(
+        path: '/conversation/:userId',
+        name: 'conversation',
+        builder: (context, state) {
+          final userId = state.pathParameters['userId'] ?? '';
+          final eventId = state.uri.queryParameters['event'];
+          return ConversationPage(userId: userId, eventId: eventId);
+        },
       ),
       GoRoute(
         path: '/profile',

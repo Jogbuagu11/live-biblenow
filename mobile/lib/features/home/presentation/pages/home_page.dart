@@ -2,24 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tmwy/core/providers/auth_provider.dart';
+import 'package:tmwy/components/bottom_nav_bar.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authStateProvider);
-    final user = authState.value?.user;
+    ref.watch(authStateProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('TMWY'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person_outline),
-            onPressed: () => context.push('/profile'),
-          ),
-        ],
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -55,14 +50,14 @@ class HomePage extends ConsumerWidget {
             const SizedBox(height: 24),
             _ActionCard(
               icon: Icons.person_add,
-              title: 'Request a Stand-In',
+              title: 'Request a Proxy',
               description: 'Find someone to be there for you',
               onTap: () => context.push('/request'),
             ),
             const SizedBox(height: 16),
             _ActionCard(
               icon: Icons.location_on,
-              title: 'Track My Stand-In',
+              title: 'Track My Proxy',
               description: 'See real-time updates',
               onTap: () => context.push('/presence/1'),
             ),
@@ -70,8 +65,8 @@ class HomePage extends ConsumerWidget {
             _ActionCard(
               icon: Icons.message,
               title: 'Messages',
-              description: 'Chat with your stand-in',
-              onTap: () {},
+              description: 'Chat with your proxy',
+              onTap: () => context.go('/messages'),
             ),
             const SizedBox(height: 16),
             _ActionCard(
@@ -95,7 +90,7 @@ class HomePage extends ConsumerWidget {
                     Text(
                       'Life moves fast, and sometimes you can\'t be everywhere at once. '
                       'Whether it\'s a funeral, wedding, court date, or hospital visit, '
-                      'we connect you with compassionate stand-ins who show up with care.',
+                      'we connect you with compassionate proxies who show up with care.',
                       style: Theme.of(context).textTheme.bodyMedium,
                       textAlign: TextAlign.center,
                     ),
@@ -111,6 +106,7 @@ class HomePage extends ConsumerWidget {
           ],
         ),
       ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 0),
     );
   }
 }

@@ -1,14 +1,30 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tmwy/core/services/social_auth_service.dart';
 
 class SupabaseService {
   static final _client = Supabase.instance.client;
 
   // Auth methods
   static Future<AuthResponse> signIn(String email, String password) async {
-    return await _client.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
+    try {
+      print('[SupabaseService] Email sign-in request for $email');
+      final response = await _client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      if (response.user == null) {
+        print('[SupabaseService] Email sign-in failed: no user returned');
+        throw AuthException('Invalid email or password');
+      }
+      print('[SupabaseService] Email sign-in success for ${response.user?.email}');
+      return response;
+    } on AuthException catch (e) {
+      print('[SupabaseService] AuthException: ${e.message}');
+      rethrow;
+    } catch (e) {
+      print('[SupabaseService] Unknown email sign-in error: $e');
+      rethrow;
+    }
   }
 
   static Future<AuthResponse> signUp(
@@ -16,16 +32,36 @@ class SupabaseService {
     String password, {
     String? name,
   }) async {
-    final response = await _client.auth.signUp(
-      email: email,
-      password: password,
-      data: name != null ? {'name': name} : null,
-    );
-    return response;
+    try {
+      print('[SupabaseService] Email sign-up request for $email');
+      final response = await _client.auth.signUp(
+        email: email,
+        password: password,
+        data: name != null ? {'name': name} : null,
+      );
+      print('[SupabaseService] Sign-up response user: ${response.user?.email}');
+      return response;
+    } on AuthException catch (e) {
+      print('[SupabaseService] AuthException: ${e.message}');
+      rethrow;
+    } catch (e) {
+      print('[SupabaseService] Unknown email sign-up error: $e');
+      rethrow;
+    }
   }
 
   static Future<void> signOut() async {
     await _client.auth.signOut();
+  }
+
+  static Future<bool> signInWithGoogle() async {
+    // Delegate to SocialAuthService
+    return await SocialAuthService.signInWithGoogle();
+  }
+
+  static Future<bool> signInWithApple() async {
+    // Delegate to SocialAuthService
+    return await SocialAuthService.signInWithApple();
   }
 
   static User? get currentUser => _client.auth.currentUser;

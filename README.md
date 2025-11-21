@@ -64,6 +64,7 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 # Stripe Configuration
 VITE_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
+VITE_STRIPE_VERIFIED_PRICE_ID=your_stripe_verified_membership_price_id
 
 # Resend Configuration (for server-side email)
 RESEND_API_KEY=your_resend_api_key
@@ -162,6 +163,7 @@ mobile/lib/
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
    - `VITE_STRIPE_PUBLISHABLE_KEY`
+   - `VITE_STRIPE_VERIFIED_PRICE_ID`
    - `VITE_APP_URL`
 3. Deploy!
 
@@ -172,11 +174,20 @@ The `vercel.json` configuration file is already set up for automatic deployments
 For production, you'll need to set up API routes for:
 - Payment intent creation (`/api/create-payment-intent`)
 - Email sending (`/api/send-email`)
+- Verified proxy memberships (`supabase/functions/create-verified-checkout`)
 
 These should be implemented as serverless functions (e.g., Vercel API routes) that securely handle:
 - Stripe secret key operations
 - Resend API key operations
 - Server-side Supabase operations with service role key
+
+For the verified membership checkout flow you will also need to provide the following server-side environment variables (for Supabase Edge Functions or wherever you deploy Stripe logic):
+
+```
+STRIPE_SECRET_KEY=sk_live_xxx
+STRIPE_VERIFIED_PRICE_ID=price_xxx   # Recurring $9.99/mo price
+APP_URL=https://takemewithyou.app
+```
 
 ## Development
 

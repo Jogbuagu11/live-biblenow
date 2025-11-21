@@ -17,11 +17,20 @@ const EventDetails = () => {
     dressCode: "",
     emotionalTone: "",
     message: "",
+    priceType: "free" as "free" | "paid" | "negotiable",
+    priceAmount: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Navigate to stand-in selection
+    if (
+      formData.priceType === "paid" &&
+      (!formData.priceAmount || Number(formData.priceAmount) <= 0)
+    ) {
+      alert("Please enter a valid payment amount for paid requests.");
+      return;
+    }
+    // Navigate to proxy selection
     navigate("/select-standin");
   };
 
@@ -40,7 +49,7 @@ const EventDetails = () => {
             Tell us about your event
           </h1>
           <p className="text-navy-light text-lg">
-            Share the details so we can find the perfect stand-in for you
+            Share the details so we can find the perfect proxy for you
           </p>
         </div>
 
@@ -130,11 +139,65 @@ const EventDetails = () => {
                 </Label>
                 <Textarea
                   id="message"
-                  placeholder="Any message you'd like your stand-in to deliver or remember"
+                  placeholder="Any message you'd like your proxy to deliver or remember"
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   className="rounded-xl border-2 focus:border-primary min-h-24"
                 />
+              </div>
+
+              <div>
+                <Label className="text-navy mb-2 block">Pricing</Label>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Let proxies know if the request is paid or volunteer-based.
+                </p>
+                <div className="grid gap-3 md:grid-cols-3">
+                  {["free", "paid", "negotiable"].map((option) => (
+                    <label
+                      key={option}
+                      className={`border rounded-xl px-4 py-3 cursor-pointer flex items-center gap-3 transition ${formData.priceType === option ? "border-primary bg-primary/5" : "border-border"}`}
+                    >
+                      <input
+                        type="radio"
+                        name="priceType"
+                        value={option}
+                        checked={formData.priceType === option}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            priceType: e.target.value as "free" | "paid" | "negotiable",
+                          })
+                        }
+                        className="accent-primary"
+                      />
+                      <span className="capitalize">
+                        {option === "paid" ? "Paid (set amount)" : option}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+
+                {formData.priceType === "paid" && (
+                  <div className="mt-4">
+                    <Label htmlFor="priceAmount" className="text-navy mb-2 block">
+                      Payment Amount (USD)
+                    </Label>
+                    <Input
+                      id="priceAmount"
+                      type="number"
+                      min="1"
+                      step="1"
+                      placeholder="e.g., 150"
+                      value={formData.priceAmount}
+                      onChange={(e) => setFormData({ ...formData, priceAmount: e.target.value })}
+                      required
+                      className="rounded-xl border-2 focus:border-primary"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      This amount will be shown to proxies when they review your request.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </Card>
@@ -149,7 +212,7 @@ const EventDetails = () => {
               Back
             </Button>
             <Button type="submit" variant="warm" className="flex-1">
-              Find My Stand-In
+              Find My Proxy
             </Button>
           </div>
         </form>

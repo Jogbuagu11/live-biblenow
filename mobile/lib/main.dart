@@ -13,10 +13,34 @@ void main() async {
   await Supabase.initialize(
     url: AppConfig.supabaseUrl,
     anonKey: AppConfig.supabaseAnonKey,
+    authOptions: const FlutterAuthClientOptions(
+      authFlowType: AuthFlowType.pkce,
+    ),
   );
 
   // Initialize Stripe
   await StripeService.initialize();
+
+  // Handle OAuth deep links
+  Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+    final event = data.event;
+    print('[Main] Auth state change event: $event');
+    print('[Main] Session: ${data.session?.user?.email ?? "No session"}');
+    print('[Main] User ID: ${data.session?.user?.id ?? "No user"}');
+    
+    if (event == AuthChangeEvent.signedIn) {
+      // User successfully signed in via OAuth
+      print('[Main] ✅ OAuth sign in successful');
+      print('[Main] User email: ${data.session?.user?.email}');
+      print('[Main] Provider: ${data.session?.user?.appMetadata?["provider"]}');
+    } else if (event == AuthChangeEvent.tokenRefreshed) {
+      print('[Main] Token refreshed');
+    } else if (event == AuthChangeEvent.signedOut) {
+      print('[Main] User signed out');
+    } else if (event == AuthChangeEvent.userUpdated) {
+      print('[Main] User updated');
+    }
+  });
 
   runApp(
     const ProviderScope(
